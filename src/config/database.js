@@ -1,8 +1,11 @@
 const Sqeuelize = require('sequelize');
+const config = require("config")
 
-const sequelize = new Sqeuelize('flyhigh', 'postgres', 'postgres', {
-  dialect: 'sqlite',
-  storage: './database.sqlite',
+const dbConfig = config.get('database')
+
+const sequelize = new Sqeuelize(dbConfig.database, dbConfig.username, dbConfig.password, {
+  dialect: dbConfig.dialect,
+  storage: dbConfig.storage,
   // logging:false // we can stop loggers
 });
 

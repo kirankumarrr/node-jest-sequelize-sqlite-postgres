@@ -1,0 +1,10 @@
+{
+    "database":{
+        "database": "flyhigh",
+        "username": "postgres",
+        "password": "postgres",
+        "dialect": "sqlite",
+        "storage": "./database.sqlite",
+        "logging":true
+    }
+}

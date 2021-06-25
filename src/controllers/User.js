@@ -12,14 +12,10 @@ exports.register = async (req, res) => {
   if(!errors.isEmpty()){
     const validationErrors = {}
     errors.array().forEach(error => {
-      validationErrors[error.param] = error.msg
+      validationErrors[error.param] = req.t(error.msg)
     });
     return res.status(400).send({validationErrors})
   }
-  try{
-    await UserService.save(req.body);
-    return res.send({ message: "User created" });
-  }catch(err){
-    return res.send({ validationErrors: {email:'E-mail in use'} });
-  }
+  await UserService.save(req.body);
+  return res.send({ message:req.t('user_create_success') });
 };

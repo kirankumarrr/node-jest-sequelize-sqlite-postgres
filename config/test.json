@@ -5,6 +5,6 @@
         "password": "postgres",
         "dialect": "sqlite",
         "storage": ":memory:",
-        "logging":true
+        "logging":false
     }
 }

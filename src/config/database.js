@@ -6,7 +6,7 @@ const dbConfig = config.get('database')
 const sequelize = new Sqeuelize(dbConfig.database, dbConfig.username, dbConfig.password, {
   dialect: dbConfig.dialect,
   storage: dbConfig.storage,
-  // logging:false // we can stop loggers
+  logging: dbConfig.logging // we can stop loggers
 });
 
 module.exports = sequelize;

@@ -7,5 +7,8 @@
     "password_null": "Password cannot be null",
     "password_size": "Password must be atleast 6 characters",
     "password_pattern": "Password must be atleast 1 uppercase, 1 lowercase and 1 number as characters",
-    "user_create_success": "User created"
+    "user_create_success": "User created",
+    "email_failure": "Email Failure",
+    "account_activation_failure":"This account is either active or the token is invalid",
+    "account_activation_success": "Account is activated"
 }

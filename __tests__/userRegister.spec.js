@@ -56,7 +56,7 @@ const postUser = (user = validUser, options = {}) => {
   return agent.send(user);
 };
 
-xdescribe("User Registration:👨‍💼⚙️🍾:", () => {
+describe("User Registration:👨‍💼⚙️🍾:", () => {
   it("should return 200 ok when signup request is valid", async () => {
     const response = await postUser();
     expect(response.status).toBe(200);
@@ -276,9 +276,17 @@ xdescribe("User Registration:👨‍💼⚙️🍾:", () => {
     const users = await User.findAll();
     expect(users.length).toBe(0);
   });
+ 
+  it("return Validations Failure messages in error response body when validation failes", async () => {
+    const response = await postUser({
+      ...validUser,
+      username: null,
+    });
+    expect(response.body.message).toBe('Validation Failure');
+  });
 });
 
-xdescribe("Internationalization", () => {
+describe("Internationalization", () => {
   const username_null = "Kullanıcı adı boş olamaz";
   const username_size = "En az 4 en fazla 32 karakter olmalı";
   const email_null = "E-Posta boş olamaz";
@@ -290,6 +298,7 @@ xdescribe("Internationalization", () => {
   const email_inuse = "Bu E-Posta kullanılıyor";
   const user_create_success = "Kullanıcı oluşturuldu";
   const email_failure = "E-Posta gönderiminde hata oluştu";
+  const validation_failure = "Girilen değerler uygun değil";
 
   test.each`
     field         | value              | expectedMessage
@@ -337,6 +346,14 @@ xdescribe("Internationalization", () => {
     simulateSmtpFailure = true;
     const response = await postUser(validUser, { language: "tr" });
     expect(response.body.message).toBe(email_failure);
+  });
+
+  it(`return ${validation_failure} messages in error response body when validation failes`, async () => {
+    const response = await postUser({
+      ...validUser,
+      username: null,
+    }, { language: "tr" });
+    expect(response.body.message).toBe(validation_failure);
   });
 });
 
@@ -405,4 +422,42 @@ describe("Account Activation", () => {
       expect(response.body.message).toBe(message);
     }
   );
+});
+
+describe("Error Model", () => {
+  it("return path, timestamp, message and validation errros in response when validation failure", async () => {
+    const response = await postUser({
+      ...validUser,
+      username: null,
+    });
+    expect(Object.keys(response.body)).toEqual(['path','timestamp','message','validationErrors'])
+  });
+
+  it("return path, timestamp, message in response when request fails othern than validation errors", async () => {
+    const token =  'never mind'
+    const response = await request(app)
+    .post("/api/1.0/users/token/" + token)
+    .send();
+    expect(Object.keys(response.body)).toEqual(['path','timestamp','message'])
+  });
+
+ 
+  it("return path in error body", async () => {
+    const token =  'never-mind'
+    const response = await request(app)
+    .post("/api/1.0/users/token/" + token)
+    .send();
+    expect(response.body.path).toBe("/api/1.0/users/token/" + token)
+  });
+
+  it("return timestamp in milliseconds within 5 seconds in error body", async () => { 
+    const nowInMillis= new Date().getTime()
+    const fivSecondsLater= nowInMillis + 5 * 1000;
+    const token =  'never mind'
+    const response = await request(app)
+    .post("/api/1.0/users/token/" + token)
+    .send();
+    expect(response.body.timestamp).toBeGreaterThan(nowInMillis)
+    expect(response.body.timestamp).toBeLessThan(fivSecondsLater)
+  });
 });

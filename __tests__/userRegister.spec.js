@@ -56,7 +56,7 @@ const postUser = (user = validUser, options = {}) => {
   return agent.send(user);
 };
 
-describe("User Registration:👨‍💼⚙️🍾:", () => {
+xdescribe("User Registration:👨‍💼⚙️🍾:", () => {
   it("should return 200 ok when signup request is valid", async () => {
     const response = await postUser();
     expect(response.status).toBe(200);
@@ -286,7 +286,7 @@ describe("User Registration:👨‍💼⚙️🍾:", () => {
   });
 });
 
-describe("Internationalization", () => {
+xdescribe("Internationalization", () => {
   const username_null = "Kullanıcı adı boş olamaz";
   const username_size = "En az 4 en fazla 32 karakter olmalı";
   const email_null = "E-Posta boş olamaz";
@@ -357,7 +357,7 @@ describe("Internationalization", () => {
   });
 });
 
-describe("Account Activation", () => {
+xdescribe("Account Activation", () => {
   it("activate the account when correct token is sent", async () => {
     await postUser();
     let users = await User.findAll();
@@ -424,7 +424,7 @@ describe("Account Activation", () => {
   );
 });
 
-describe("Error Model", () => {
+xdescribe("Error Model", () => {
   it("return path, timestamp, message and validation errros in response when validation failure", async () => {
     const response = await postUser({
       ...validUser,

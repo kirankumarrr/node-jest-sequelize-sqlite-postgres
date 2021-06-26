@@ -44,10 +44,22 @@ exports.registerActivationToken = async (req, res, next) => {
  * @access : PUBLIC
  */
 exports.getUserLisiting = async (req, res, next) => {
-  res.send({
-    content: [],
-    page: 0,
-    size: 10,
-    totalPage: 0,
-  });
+  const { page, size } = req.pagination
+  const users = await UserService.getUsers({page,size})
+  res.send(users);
 };
+
+/*
+ * @desc : fetch users from database
+ * @route : GET /api/1.0/users
+ * @access : PUBLIC
+ */
+exports.getUser = async (req, res, next) => {
+  try{
+    const user =await UserService.fetchUser(req.params.id)
+    res.send(user)
+  }catch(err){
+    next(err)
+  }
+};
+

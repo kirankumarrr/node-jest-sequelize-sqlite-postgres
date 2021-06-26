@@ -4,7 +4,8 @@ const crypto = require("crypto");
 const EmailService = require("./Email");
 const sequelize = require("../config/database");
 const EmailException = require("../Errors/Email");
-const InvalidTokenException = require("../Errors/User");
+const InvalidTokenException = require("../Errors/UserInvalidTokenException");
+const UserNotFoundExpection = require("../Errors/UserNotFoundExpection");
 const generateToken = (length) => {
   return crypto.randomBytes(16).toString("hex").substring(0, length);
 };
@@ -49,4 +50,31 @@ const activate = async (token) => {
   await user.save();
 };
 
-module.exports = { save, findByEmail, activate };
+const getUsers = async ({page=0,size=10}={}) => {
+  const usersWithCount = await User.findAndCountAll({
+    where: { inactive: false },
+    attributes: ["id", "username", "email"],
+    limit: size,
+    offset: page * size
+  });
+
+  // DRY
+  // const count = await User.count({ where: { inactive: false } });
+
+  return {
+    content: usersWithCount.rows,
+    page,
+    size,
+    totalPage: Math.ceil(usersWithCount.count/size),
+  };
+};
+
+const fetchUser = async(id)=>{
+  const user = await User.findOne({where: { id,inactive:false },attributes:['id','username','email']})
+  if(!user){
+    throw new UserNotFoundExpection() 
+  }
+  return user
+}
+
+module.exports = { save, findByEmail, activate, getUsers,fetchUser };

@@ -1,4 +1,4 @@
-module.exports = function ForbiddenException ( ) {
-    this.message = 'inactive_authentication_failure';
+module.exports = function ForbiddenException (message) {
+    this.message = message || 'inactive_authentication_failure';
     this.status  = 403;
 }

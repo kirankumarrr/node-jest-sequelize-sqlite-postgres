@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const EmailService = require("./Email");
+const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
 const EmailException = require("../Errors/Email");
 const InvalidTokenException = require("../Errors/UserInvalidTokenException");
@@ -50,12 +51,17 @@ const activate = async (token) => {
   await user.save();
 };
 
-const getUsers = async ({page=0,size=10}={}) => {
+const getUsers = async ({ page = 0, size = 10, authenticatedUser } = {}) => {
   const usersWithCount = await User.findAndCountAll({
-    where: { inactive: false },
+    where: {
+      inactive: false,
+      id: {
+        [Sequelize.Op.not]: authenticatedUser ? authenticatedUser.id : 0,
+      },
+    },
     attributes: ["id", "username", "email"],
     limit: size,
-    offset: page * size
+    offset: page * size,
   });
 
   // DRY
@@ -65,16 +71,32 @@ const getUsers = async ({page=0,size=10}={}) => {
     content: usersWithCount.rows,
     page,
     size,
-    totalPage: Math.ceil(usersWithCount.count/size),
+    totalPage: Math.ceil(usersWithCount.count / size),
   };
 };
 
-const fetchUser = async(id)=>{
-  const user = await User.findOne({where: { id,inactive:false },attributes:['id','username','email']})
-  if(!user){
-    throw new UserNotFoundExpection() 
+const fetchUser = async (id) => {
+  const user = await User.findOne({
+    where: { id, inactive: false },
+    attributes: ["id", "username", "email"],
+  });
+  if (!user) {
+    throw new UserNotFoundExpection();
   }
-  return user
-}
+  return user;
+};
 
-module.exports = { save, findByEmail, activate, getUsers,fetchUser };
+const updateUser = async (id, updateBody) => {
+  const user = await User.findOne({ where: { id } });
+  user.username = updateBody.username;
+  await user.save();
+};
+
+module.exports = {
+  save,
+  findByEmail,
+  activate,
+  getUsers,
+  fetchUser,
+  updateUser,
+};

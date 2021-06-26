@@ -3,7 +3,8 @@ const request = require("supertest");
 const app = require("../src/app");
 const User = require("../src/models/User");
 const sequelize = require("../src/config/database");
-const EmailService = require("../src/services/Email");
+const en = require('../locales/en/translation.json')
+const tr = require('../locales/tr/translation.json')
 const validUser = {
   username: "user1",
   email: "user1@gmail.com",
@@ -13,8 +14,8 @@ beforeAll(async () => {
   await sequelize.sync(); // initilize db
 });
 
-beforeEach(() => {
-  return User.destroy({ truncate: true });
+beforeEach(async() => {
+  await User.destroy({ truncate: true });
 });
 
 const getUsers = () => {
@@ -34,7 +35,7 @@ const addUsers = async (activeUserCount=0, inActiveUserCount=0) => {
   }
 };
 
-xdescribe("Listing Users", () => {
+describe("Listing Users", () => {
   it("should return 200 ok when there are no user in database", async () => {
     const response = await getUsers();
     expect(response.status).toBe(200);
@@ -137,8 +138,8 @@ describe('Get User:', () => {
 
   it.each`
     language | message
-    ${'tr'} | ${"Kullanıcı bulunamadı"}
-    ${'en'} | ${"User not found"}
+    ${'tr'} | ${tr.user_not_found}
+    ${'en'} | ${en.user_not_found}
   `("returns $message for unkown user when language is set to $language",async({language , message})=>{
     const response = await getUser(5).set("Accept-Language", language)
     expect(response.body.message).toBe(message)

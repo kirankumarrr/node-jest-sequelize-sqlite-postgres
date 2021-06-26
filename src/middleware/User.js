@@ -33,3 +33,13 @@ const password = check("password")
   .withMessage('password_pattern');
 
 exports.registerValidator = () => [username, email, password];
+
+
+const emailAuth = check('email')
+  .notEmpty()
+  .withMessage('email_null')
+  .bail()
+  .isEmail()
+  .withMessage('email_invalid');
+
+exports.authLoginValidator = () => [ emailAuth, password];

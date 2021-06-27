@@ -20,7 +20,7 @@ const addUsers = async (activeUserCount=0, inActiveUserCount=0) => {
 
 // Not to use in prod: data may loose
 sequelize.sync({force:true}).then(async()=>{
-    await addUsers(9)
+  await addUsers(9)
 })
 
 app.listen(3000, () => {

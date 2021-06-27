@@ -19,11 +19,19 @@ beforeEach(async() => {
   await User.destroy({ truncate: true });
 });
 
+const auth = async (options={})=>{
+  let token;
+  if (options.auth) {
+    const res = await request(app).post("/api/1.0/auth").send(options.auth);
+    token = res.body.token;
+  }
+  return token
+}
+
 const getUsers = (options={}) => {
-  const agent = request(app).get("/api/1.0/users");
-  if(options.auth){
-    const { email, password } = options.auth
-    agent.auth(email,password)
+  let agent = request(app).get("/api/1.0/users");
+  if (options.token) {
+    agent.set("Authorization",`Bearer ${options.token}`);
   }
   return agent
 };
@@ -49,7 +57,7 @@ describe("Listing Users", () => {
     expect(response.status).toBe(200);
   });
 
-  it("should return object as response body", async () => {
+  it("should return object as response b̥ody", async () => {
     const response = await getUsers();
     expect(response.body).toEqual({
       content: [],
@@ -92,7 +100,7 @@ describe("Listing Users", () => {
     expect(response.body.content[0].username).toBe('user11')
     expect(response.body.page).toBe(1)
   });
- 
+
   it("should return first page when page is set to below zero as request parameter", async () => {
     await addUsers(11);
     const response = await getUsers().query({
@@ -139,7 +147,8 @@ describe("Listing Users", () => {
 
   it('return user page without logged in user when request has valid authorization',async () => {
     await addUsers(11);
-    const response = await getUsers({auth:{email: "user1@gmail.com",password: "P$4ssword"}})
+    const token = await auth({auth:{email: "user1@gmail.com",password: "P$4ssword"}})
+    const response = await getUsers({token})
     expect(response.body.totalPage).toBe(1)
     expect(response.body.content.length).toBe(10)
   })

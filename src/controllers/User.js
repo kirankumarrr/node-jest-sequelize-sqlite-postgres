@@ -47,7 +47,7 @@ exports.registerActivationToken = async (req, res, next) => {
 exports.getUserLisiting = async (req, res, next) => {
   const authenticatedUser = req.authenticatedUser;
   const { page, size } = req.pagination;
-  const users = await UserService.getUsers({ page, size, authenticatedUser});
+  const users = await UserService.getUsers({ page, size, authenticatedUser });
   res.send(users);
 };
 
@@ -80,5 +80,5 @@ exports.updateUser = async (req, res, next) => {
   }
   await UserService.updateUser(req.params.id, req.body);
 
-  return res.send();
+  return res.send({ message: "User Updated successfully" });
 };

@@ -17,7 +17,7 @@ const sendAccountActivation = async (email, token) => {
   });
 
   if(process.env.NODE_ENV==='development'){
-    console.log(`url: ${nodemailer.getTestMessageUrl(info)}`);
+    console.log(`url: ${nodemailer.getTestMessageUrl(info)}`);  
   }
 
 };

@@ -32,17 +32,24 @@ const addUser = async (user = { ...activeUser }) => {
 };
 
 const putUser = async (id = 1, body = null, options = {}) => {
-  let agent = request(app).put(`/api/1.0/users/${id}`);
+  let agent = request(app);
+  let token;
+  if (options.auth) {
+    const res = await agent.post("/api/1.0/auth").send(options.auth);
+    token = res.body.token;
+  }
+
+  agent = request(app).put(`/api/1.0/users/${id}`);
 
   if (options.language) {
     agent.set("Accept-Language", options.language);
   }
-  if (options.auth) {
-    const { email, password} = options.auth;
-    // const merged = `${email}:${password}`
-    // const base64 = Buffer.from(merged).toString(64)
-    // agent.set("Authorization",`Basic ${base64}`);
-    agent.auth(email,password)
+  if (token) {
+    agent.set("Authorization",`Bearer ${token}`);
+  }
+
+  if(options.token) {
+    agent.set("Authorization",`Bearer ${options.token}`);
   }
   return agent.send(body);
 };
@@ -79,7 +86,7 @@ describe("User Update Route:", () => {
         password: "P$4ssword",
       },
     });
-    expect(response.status).toBe(403)
+    expect(response.status).toBe(403);
   });
   test("should return forbidden request sent with incorrect email in basic authorization", async () => {
     await addUser();
@@ -89,55 +96,63 @@ describe("User Update Route:", () => {
         password: "password",
       },
     });
-    expect(response.status).toBe(403)
+    expect(response.status).toBe(403);
   });
   test("should return forbidden request is sent with correct credentials but for different users", async () => {
     await addUser();
-    const userToBeUpdated = await addUser({...activeUser,username:'user2',email:'user2@gmail.com'})
+    const userToBeUpdated = await addUser({
+      ...activeUser,
+      username: "user2",
+      email: "user2@gmail.com",
+    });
     const response = await putUser(userToBeUpdated.id, null, {
       auth: {
         email: "user1@gmail.com",
         password: "P$4ssword",
       },
     });
-    expect(response.status).toBe(403)
+    expect(response.status).toBe(403);
   });
 
   test("should return forbidden request is sent by inactive user with correct credentials for its own user", async () => {
-    const inactivUser = await addUser({...activeUser,inactive:true});
+    const inactivUser = await addUser({ ...activeUser, inactive: true });
     const response = await putUser(inactivUser.id, null, {
       auth: {
         email: "user1@gmail.com",
         password: "P$4ssword",
       },
     });
-    expect(response.status).toBe(403)
+    expect(response.status).toBe(403);
   });
 
   test("should return 200 ok when valid update request sent from authorized user", async () => {
     const savedUser = await addUser();
-    const validUpdate = { username : 'user1-updated'}
+    const validUpdate = { username: "user1-updated" };
     const response = await putUser(savedUser.id, validUpdate, {
       auth: {
         email: savedUser.email,
         password: "P$4ssword",
       },
     });
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(200);
   });
 
   test("should updates username in database when valid update request is sent from user", async () => {
     const savedUser = await addUser();
-    const validUpdate = { username : 'user1-updated'}
-    const response = await putUser(savedUser.id, validUpdate, {
+    const validUpdate = { username: "user1-updated" };
+    await putUser(savedUser.id, validUpdate, {
       auth: {
         email: savedUser.email,
         password: "P$4ssword",
       },
     });
-    
-    const inDdUser = await User.findOne({where:{id:savedUser.id}})
 
-    expect(inDdUser.username).toBe(validUpdate.username)
+    const inDdUser = await User.findOne({ where: { id: savedUser.id } });
+
+    expect(inDdUser.username).toBe(validUpdate.username);
+  });
+  test("return 403 when token is not valid", async () => {
+    const response = await putUser(5, null, {token:'123'});
+    expect(response.status).toBe(403);
   });
 });

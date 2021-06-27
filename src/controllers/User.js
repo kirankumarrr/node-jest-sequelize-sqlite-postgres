@@ -82,3 +82,11 @@ exports.updateUser = async (req, res, next) => {
 
   return res.send({ message: "User Updated successfully" });
 };
+/*
+ * @desc : fetch users from database
+ * @route : GET /api/1.0/users
+ * @access : PUBLIC
+ */
+exports.deleteUser = async (req, res, next) => {
+  next(new ForbiddenException('unauthroized_user_delete'))
+};

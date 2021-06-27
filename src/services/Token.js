@@ -1,4 +1,3 @@
-// const jwt = require("jsonwebtoken");
 const Token = require("../models/Token");
 const { randomString } = require("../shared/generator");
 const createToken = async (user) => {
@@ -22,7 +21,12 @@ const verify = async (token) => {
   return { id: userId };
 };
 
+const deleteToken = async (token) => {
+  await Token.destroy({ where: { token } });
+};
+
 module.exports = {
   createToken,
   verify,
+  deleteToken,
 };

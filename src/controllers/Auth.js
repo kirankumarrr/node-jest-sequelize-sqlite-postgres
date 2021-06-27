@@ -37,3 +37,17 @@ exports.authenticate = async (req, res, next) => {
     token,
   });
 };
+
+/*
+ * @desc : delete token from database
+ * @route : POST /api/1.0/auth/logout
+ * @access : PUBLIC
+ */
+exports.authLogout = async (req, res, next) => {
+  const authorization = req.headers.authorization;
+  if (authorization) {
+    const token = authorization.substring(7);
+    await TokenService.deleteToken(token)
+  }
+  res.send()
+};

@@ -1,10 +1,11 @@
 const request = require("supertest");
 const app = require("../src/app");
 const User = require("../src/models/User");
+const Token = require("../src/models/Token");
 const sequelize = require("../src/config/database");
 const bcrypt = require("bcrypt");
-const en = require('../locales/en/translation.json')
-const tr = require('../locales/tr/translation.json')
+const en = require("../locales/en/translation.json");
+const tr = require("../locales/tr/translation.json");
 
 beforeAll(async () => {
   await sequelize.sync(); // initilize db
@@ -40,6 +41,15 @@ const postAuthenticaiton = async (credentials, options = {}) => {
   return agent.send(credentials);
 };
 
+const postAuthLogout = async ( options = {}) => {
+  let agent = request(app).post("/api/1.0/auth/logout");
+
+  if (options.token) {
+    agent.set("Authorization", `Bearer ${options.token}`);
+  }
+  return agent.send();
+};
+
 describe("Authentication", () => {
   it("return 200 when credentials are correct", async () => {
     await addUser();
@@ -55,7 +65,7 @@ describe("Authentication", () => {
     });
     expect(response.body.id).toBe(user.id);
     expect(response.body.username).toBe(user.username);
-    expect(Object.keys(response.body)).toEqual(["id", "username",'token']);
+    expect(Object.keys(response.body)).toEqual(["id", "username", "token"]);
   });
 
   it("return 401 when user does not exist", async () => {
@@ -115,15 +125,33 @@ describe("Authentication", () => {
       expect(response.body.message).toBe(message);
     }
   );
-  
+
   it("return 401 when e-mail is not valid", async () => {
-    const response = await postAuthenticaiton({password:'Ps4word'});
+    const response = await postAuthenticaiton({ password: "Ps4word" });
     expect(response.status).toBe(401);
   });
-  
+
   it("return token in response body when crendentials are correct", async () => {
     await addUser();
     const response = await postAuthenticaiton(activeUser);
-    expect(response.body.token).not.toBeUndefined()
+    expect(response.body.token).not.toBeUndefined();
+  });
+});
+
+describe("LOGOUT:::", () => {
+  it("return 200 ok when unauthorized request send for logout", async () => {
+    const response = await postAuthLogout();
+    expect(response.status).toBe(200);
+  });
+  it("should remove the token from databse", async () => {
+    await addUser();
+    const response = await postAuthenticaiton({ ...activeUser });
+
+    const token = response.body.token
+    await postAuthLogout({token});
+
+    const storedToken = await Token.findOne({where:{token}})
+
+    expect(storedToken).toBeNull();
   });
 });

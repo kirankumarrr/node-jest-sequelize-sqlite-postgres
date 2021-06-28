@@ -6,7 +6,8 @@ const sequelize = require("../config/database");
 const EmailException = require("../Errors/Email");
 const InvalidTokenException = require("../Errors/UserInvalidTokenException");
 const UserNotFoundExpection = require("../Errors/UserNotFoundExpection");
-const {  randomString } = require('../shared/generator')
+const { randomString } = require("../shared/generator");
+const Token = require("../models/Token");
 
 const save = async (body) => {
   const { username, email, password } = body;
@@ -89,11 +90,16 @@ const updateUser = async (id, updateBody) => {
   await user.save();
 };
 
-module.exports = {
+const deleteUser = async (id) => {
+  await User.destroy({ where: { id } });
+};
+
+module.exports = { 
   save,
   findByEmail,
   activate,
   getUsers,
   fetchUser,
   updateUser,
+  deleteUser,
 };

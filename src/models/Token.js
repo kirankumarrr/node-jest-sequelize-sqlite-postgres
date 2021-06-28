@@ -7,10 +7,7 @@ Token.init(
   {
     token: {
       type: Sequelize.STRING,
-    },
-    userId: {
-      type: Sequelize.INTEGER,
-    },
+    }
   },
   {
     sequelize,

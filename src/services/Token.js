@@ -28,5 +28,5 @@ const deleteToken = async (token) => {
 module.exports = {
   createToken,
   verify,
-  deleteToken,
+  deleteToken
 };

@@ -9,11 +9,14 @@ const Token = require("../src/models/Token");
 
 beforeAll(async () => {
   await sequelize.sync(); // initilize db
-  
 });
 
 beforeEach(async () => {
-  await User.destroy({ truncate: true });
+  await User.destroy({
+    truncate: {
+      cascade: true,
+    },
+  });
 });
 
 const validUser = {
@@ -56,7 +59,7 @@ const deleteUser = async (id = 1, options = {}) => {
 };
 
 describe("DELETE USER ::::", () => {
-  it.only("returns forbidden when request sent unauthorization:", async () => {
+  it("returns forbidden when request sent unauthorization:", async () => {
     const res = await deleteUser();
     expect(res.status).toBe(403);
   });
@@ -97,34 +100,50 @@ describe("DELETE USER ::::", () => {
 
   it("return 403 when token is not valid", async () => {
     const response = await deleteUser(5, { token: "123" });
-    console.log('response :', response);
     expect(response.status).toBe(403);
   });
 
-  //   it("should return 200 ok when valid update request sent from authorized user", async () => {
-  //     const savedUser = await addUser();
-  //     const validUpdate = { username: "user1-updated" };
-  //     const response = await deleteUser(savedUser.id, validUpdate, {
-  //       auth: {
-  //         email: savedUser.email,
-  //         password: "P$4ssword",
-  //       },
-  //     });
-  //     expect(response.status).toBe(200);
-  //   });
+  it("should return 200 ok when valid update request sent from authorized user", async () => {
+    const savedUser = await addUser();
+    const token = await auth({
+      auth: { email: "user1@gmail.com", password: "P$4ssword" },
+    });
+    const response = await deleteUser(savedUser.id, { token });
+    expect(response.status).toBe(200);
+  });
 
-  //   it("should updates username in database when valid update request is sent from user", async () => {
-  //     const savedUser = await addUser();
-  //     const validUpdate = { username: "user1-updated" };
-  //     await deleteUser(savedUser.id, validUpdate, {
-  //       auth: {
-  //         email: savedUser.email,
-  //         password: "P$4ssword",
-  //       },
-  //     });
+  it("should delete username in database when valid update request is sent from user", async () => {
+    const savedUser = await addUser();
+    const token = await auth({
+      auth: { email: "user1@gmail.com", password: "P$4ssword" },
+    });
+    await deleteUser(savedUser.id, { token });
 
-  //     const inDdUser = await User.findOne({ where: { id: savedUser.id } });
+    const inDdUser = await User.findOne({ where: { id: savedUser.id } });
 
-  //     expect(inDdUser.username).toBe(validUpdate.username);
-  //   });
+    expect(inDdUser).toBeNull();
+  });
+
+  it("should delete token when user delete from db by authorized user", async () => {
+    const savedUser = await addUser();
+    const token = await auth({
+      auth: { email: "user1@gmail.com", password: "P$4ssword" },
+    });
+    await deleteUser(savedUser.id, { token });
+    const tokenInDB = await Token.findOne({ where: { token } });
+    expect(tokenInDB).toBeNull();
+  });
+
+  it("should delete all tokens when user delete from db by authorized user", async () => {
+    const savedUser = await addUser();
+    const token1 = await auth({
+      auth: { email: "user1@gmail.com", password: "P$4ssword" },
+    });
+    const token2 = await auth({
+      auth: { email: "user1@gmail.com", password: "P$4ssword" },
+    });
+    await deleteUser(savedUser.id, { token: token1 });
+    const tokenInDB = await Token.findOne({ where: { token: token2 } });
+    expect(tokenInDB).toBeNull();
+  });
 });

@@ -15,8 +15,12 @@ beforeAll(async () => {
   await sequelize.sync(); // initilize db
 });
 
-beforeEach(async() => {
-  await User.destroy({ truncate: true });
+beforeEach(async () => {
+  await User.destroy({
+    truncate: {
+      cascade: true,
+    },
+  });
 });
 
 const auth = async (options={})=>{

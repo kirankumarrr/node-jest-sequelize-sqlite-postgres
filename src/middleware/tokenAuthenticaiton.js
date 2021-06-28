@@ -12,6 +12,7 @@ const tokenAuthentication = async (req, res, next) => {
       req.authenticatedUser = user;
     } catch (err) {
       console.log(colors.white.bgRed("TOKEN ERROR", err));
+      next();
     }
   }
   next();

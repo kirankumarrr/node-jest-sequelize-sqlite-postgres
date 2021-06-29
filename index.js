@@ -15,6 +15,6 @@ logger.verbose(`verbose`);
 logger.debug(`debug`);
 logger.silly(`silly`);
 
-app.listen(3000, () => {
+app.listen(process.env.PORT || 3000, () => {
   logger.info(`"Server·is·running·on·PORT·3000"`);
 });

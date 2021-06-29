@@ -27,3 +27,6 @@ npx sequelize-cli model:generate --name user --attributes username:string,emai:s
   npx sequelize-cli seed:generate --name add-users
 
   npx sequelize-cli db:seed:all
+
+# Deployment
+  heroku config:set NPM_CONFIG_PRODUCTION=false YARN_PRODUCTION=false

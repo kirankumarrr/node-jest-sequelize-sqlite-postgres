@@ -8,11 +8,17 @@ const en = require("../locales/en/translation.json");
 const tr = require("../locales/tr/translation.json");
 
 beforeAll(async () => {
-  await sequelize.sync(); // initilize db
+  if (process.env.NODE_ENV === "test") {
+    await sequelize.sync(); // initilize db
+  }
 });
 
 beforeEach(async () => {
-  await User.destroy({ truncate: true });
+  await User.destroy({
+    truncate: {
+      cascade: true,
+    },
+  });
 });
 
 const validUser = {
@@ -41,7 +47,7 @@ const postAuthenticaiton = async (credentials, options = {}) => {
   return agent.send(credentials);
 };
 
-const postAuthLogout = async ( options = {}) => {
+const postAuthLogout = async (options = {}) => {
   let agent = request(app).post("/api/1.0/auth/logout");
 
   if (options.token) {
@@ -147,11 +153,102 @@ describe("LOGOUT:::", () => {
     await addUser();
     const response = await postAuthenticaiton({ ...activeUser });
 
-    const token = response.body.token
-    await postAuthLogout({token});
+    const token = response.body.token;
+    await postAuthLogout({ token });
 
-    const storedToken = await Token.findOne({where:{token}})
+    const storedToken = await Token.findOne({ where: { token } });
 
     expect(storedToken).toBeNull();
+  });
+});
+
+describe("Token Expiration:::", () => {
+  const activeUser = {
+    ...validUser,
+    inactive: false,
+  };
+
+  const addUser = async (user = { ...activeUser }) => {
+    const hash = await bcrypt.hash(user.password, 10);
+    user.password = hash;
+    return await User.create(user);
+  };
+
+  const putUser = async (id = 1, body = null, options = {}) => {
+    let agent = request(app).put(`/api/1.0/users/${id}`);
+    let token;
+
+    if (token) {
+      agent.set("Authorization", `Bearer ${token}`);
+    }
+
+    if (options.token) {
+      agent.set("Authorization", `Bearer ${options.token}`);
+    }
+    return agent.send(body);
+  };
+
+  it("return 403 when token is older then one week", async () => {
+    const savedUser = await addUser();
+
+    const token = "test-token";
+    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 - 1);
+    await Token.create({
+      token,
+      userId: savedUser.id,
+      lastUsedAt: oneWeekAgo,
+    });
+
+    const validUpdate = { username: "user1-updated" };
+
+    const response = await putUser(savedUser.id, validUpdate, { token });
+
+    expect(response.status).toBe(403);
+  });
+
+  it("refreshes lastUsedAt when unexpired token is used", async () => {
+    const savedUser = await addUser();
+
+    const token = "test-token";
+    const fourDaysAgo = new Date(Date.now() - 4 * 24 * 60 * 60 * 1000);
+    await Token.create({
+      token,
+      userId: savedUser.id,
+      lastUsedAt: fourDaysAgo,
+    });
+
+    const validUpdate = { username: "user1-updated" };
+    const rightBeforeSendingRequest = new Date();
+    await putUser(savedUser.id, validUpdate, { token });
+
+    const tokenInDb = await Token.findOne({ where: { token } });
+
+    expect(tokenInDb.lastUsedAt.getTime()).toBeGreaterThan(
+      rightBeforeSendingRequest.getTime()
+    );
+  });
+
+  it("token to be refreshed when ever users consumes any route", async () => {
+    const savedUser = await addUser();
+
+    const token = "test-token";
+    const fourDaysAgo = new Date(Date.now() - 4 * 24 * 60 * 60 * 1000);
+    await Token.create({
+      token,
+      userId: savedUser.id,
+      lastUsedAt: fourDaysAgo,
+    });
+
+    const validUpdate = { username: "user1-updated" };
+    const rightBeforeSendingRequest = new Date();
+    await request(app)
+      .get("/api/1.0/users/5")
+      .set("Authorization", `Bearer ${token}`);
+
+    const tokenInDb = await Token.findOne({ where: { token } });
+
+    expect(tokenInDb.lastUsedAt.getTime()).toBeGreaterThan(
+      rightBeforeSendingRequest.getTime()
+    );
   });
 });

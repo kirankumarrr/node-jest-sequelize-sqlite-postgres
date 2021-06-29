@@ -4,10 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=development nodemon index",
-    "test": "cross-env NODE_ENV=test jest --watchAll --verbose",
-    "test:c": "cross-env NODE_ENV=test jest --coverage",
-    "lint": "eslint . --fix"
+    "start:dev": "cross-env NODE_ENV=development npm run migrate && cross-env NODE_ENV=development nodemon index",
+    "start": "cross-env NODE_ENV=production npm run migrate && cross-env NODE_ENV=production node index",
+    "test": "cross-env NODE_ENV=test jest --watchAll && cross-env NODE_ENV=test npm run cleanup-up",
+    "test:staging:maxWorkers": "cross-env NODE_ENV=staging jest -f . --maxWorkers=1",
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage",
+    "lint": "eslint . --fix",
+    "test:staging": "cross-env NODE_ENV=staging npm run migrate && cross-env NODE_ENV=staging jest --runInBand --forceExit && cross-env NODE_ENV=staging npm run cleanup-up",
+    "migrate": "sequelize-cli db:migrate"
   },
   "keywords": [],
   "author": "",
@@ -22,9 +26,12 @@
     "i18next-fs-backend": "^1.1.1",
     "i18next-http-middleware": "^3.1.3",
     "nodemailer": "^6.6.2",
+    "pg": "^8.6.0",
     "sequelize": "^6.6.2",
+    "sequelize-cli": "^6.2.0",
     "sqlite3": "^5.0.2",
-    "validator": "^13.6.0"
+    "validator": "^13.6.0",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",

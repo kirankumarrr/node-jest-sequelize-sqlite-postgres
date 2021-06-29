@@ -88,5 +88,15 @@ exports.updateUser = async (req, res, next) => {
  * @access : PUBLIC
  */
 exports.deleteUser = async (req, res, next) => {
-  next(new ForbiddenException('unauthroized_user_delete'))
+  const authenticatedUser = req.authenticatedUser;
+
+  if (
+    (req.params.id !== undefined && !authenticatedUser) ||
+    authenticatedUser.id !== parseInt(req.params.id)
+  ) {
+    next(new ForbiddenException("unauthroized_user_delete"));
+  } else {
+    await UserService.deleteUser(req.params.id)
+    res.send()
+  }
 };

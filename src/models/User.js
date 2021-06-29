@@ -1,30 +1,35 @@
-const Sequelize = require('sequelize');
-const sequelize = require('../config/database')
-const Model = Sequelize.Model
+const Sequelize = require("sequelize");
+const sequelize = require("../config/database");
+const Model = Sequelize.Model;
 class User extends Model {}
-
-User.init({
-    username:{
-        type:Sequelize.STRING
+const Token = require("./Token");
+User.init(
+  {
+    username: {
+      type: Sequelize.STRING,
     },
-    email:{
-        type:Sequelize.STRING,
-        unique:true
+    email: {
+      type: Sequelize.STRING,
+      unique: true,
     },
-    password:{
-        type:Sequelize.STRING
+    password: {
+      type: Sequelize.STRING,
     },
-    inactive:{
-        type: Sequelize.BOOLEAN, 
-        allowNull: false, 
-        defaultValue: true
+    inactive: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
     },
-    activationToken:{
-        type:Sequelize.STRING
-    }
-},{
+    activationToken: {
+      type: Sequelize.STRING,
+    },
+  },
+  {
     sequelize,
-    modelName:'user' //table name
-})
+    modelName: "user", //table name
+  }
+);
 
-module.exports = User
+User.hasMany(Token, { onDelete: "cascade", foreignKey: "userId" });
+
+module.exports = User;

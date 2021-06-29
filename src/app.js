@@ -7,6 +7,8 @@ const ErrorHandler = require("./middleware/ErrorHandler");
 const UserRouter = require("./routers/User");
 const AuthRouter = require("./routers/Auth");
 
+const tokenAuthentication = require('./middleware/tokenAuthenticaiton')
+
 i18next
   .use(Backend)
   .use(middleware.LanguageDetector)
@@ -28,6 +30,8 @@ const app = express();
 app.use(middleware.handle(i18next));
 
 app.use(express.json());
+
+app.use(tokenAuthentication)
 
 app.use("/api", AuthRouter);
 app.use("/api", UserRouter);

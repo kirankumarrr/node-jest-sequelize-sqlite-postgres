@@ -8,7 +8,9 @@ const tr = require("../locales/tr/translation.json");
 const Token = require("../src/models/Token");
 
 beforeAll(async () => {
-  await sequelize.sync(); // initilize db
+  if (process.env.NODE_ENV === "test") {
+    await sequelize.sync(); // initilize db
+  }
 });
 
 beforeEach(async () => {

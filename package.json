@@ -5,9 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon index",
-    "test": "cross-env NODE_ENV=test jest --watchAll --verbose",
-    "test:c": "cross-env NODE_ENV=test jest --coverage",
-    "lint": "eslint . --fix"
+    "test": "cross-env NODE_ENV=test jest --watchAll",
+    "posttest": "cross-env NODE_ENV=test node test-cleanup",
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage",
+    "lint": "eslint . --fix",
+    "test:staging:maxWorkers": "cross-env NODE_ENV=staging jest -f . --maxWorkers=1",
+    "test:staging": "cross-env NODE_ENV=staging jest --runInBand",
+    "migrate:test": "cross-env NODE_ENV=staging sequelize-cli db:migrate",
+    "pretest:staging": "npm run migrate:test"
   },
   "keywords": [],
   "author": "",

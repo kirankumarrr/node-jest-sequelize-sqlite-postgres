@@ -24,7 +24,15 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      }
+      },
+      inactive: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
+      activationToken: {
+        type: Sequelize.STRING,
+      },
     });
   },
   down: async (queryInterface, Sequelize) => {

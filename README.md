@@ -11,6 +11,7 @@
 
 # CREATE MIGREATE FILE 
 npx sequelize-cli migration:generate --name user-inactive-column
+npx sequelize-cli migration:generate --name create-token
 
 # CREATE FIELDS WITH TABLE :
 npx sequelize-cli model:generate --name user --attributes username:string,emai:string,password:string

@@ -8,7 +8,9 @@ const en = require("../locales/en/translation.json");
 const tr = require("../locales/tr/translation.json");
 
 beforeAll(async () => {
-  await sequelize.sync(); // initilize db
+  if (process.env.NODE_ENV === "test") {
+    await sequelize.sync(); // initilize db
+  }
 });
 
 beforeEach(async () => {
@@ -239,7 +241,9 @@ describe("Token Expiration:::", () => {
 
     const validUpdate = { username: "user1-updated" };
     const rightBeforeSendingRequest = new Date();
-    await request(app).get('/api/1.0/users/5').set('Authorization',`Bearer ${token}`)
+    await request(app)
+      .get("/api/1.0/users/5")
+      .set("Authorization", `Bearer ${token}`);
 
     const tokenInDb = await Token.findOne({ where: { token } });
 

@@ -12,7 +12,9 @@ const validUser = {
   password: "P$4ssword",
 };
 beforeAll(async () => {
-  await sequelize.sync(); // initilize db
+  if (process.env.NODE_ENV === "test") {
+    await sequelize.sync(); // initilize db
+  }
 });
 
 beforeEach(async () => {

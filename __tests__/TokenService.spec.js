@@ -9,7 +9,9 @@ const timeUtils = require("../src/Utils/time");
 const tokenAuthentication = require("../src/middleware/tokenAuthenticaiton");
 
 beforeAll(async () => {
-  await sequelize.sync(); // initilize db
+  if (process.env.NODE_ENV === "test") {
+    await sequelize.sync(); // initilize db
+  }
 });
 
 beforeEach(async () => {

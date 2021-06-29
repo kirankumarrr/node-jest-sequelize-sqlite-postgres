@@ -3,8 +3,7 @@
         "database": "flyhigh",
         "username": "postgres",
         "password": "postgres",
-        "dialect": "sqlite",
-        "storage": "./staging.sqlite",
+        "dialect": "postgres",
         "logging":false
     },
     "mail":{

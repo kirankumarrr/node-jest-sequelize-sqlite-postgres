@@ -1,0 +1,27 @@
+{"message":"error","level":"error"}
+{"message":"warn","level":"warn"}
+{"message":"info","level":"info"}
+{"message":"verbose","level":"verbose"}
+{"message":"debug","level":"debug"}
+{"message":"\"Server·is·running·on·PORT·3000\"","level":"info"}
+{"message":"error","level":"error"}
+{"message":"error","level":"error"}
+2021-06-29T16:35:36.354Z error error
+[37m[41m2021-06-29T16:36:56.526Z error error[49m[39m
+[37m[41m2021-06-29T16:38:09.293Z error error[49m[39m
+[37m[41m2021-06-29T16:38:12.631Z error error[49m[39m
+[37m[41m2021-06-29T16:39:58.961Z error error[49m[39m
+[37m[41m2021-06-29T16:40:22.620Z error error[49m[39m
+[37m[41m2021-06-29T16:40:36.878Z error error[49m[39m
+[37m[41m2021-06-29T16:40:54.746Z error error[49m[39m
+[37m[41m2021-06-29T16:41:06.376Z error error[49m[39m
+[37m[41m2021-06-29T16:41:30.252Z [error] error[49m[39m
+[37m[41m2021-06-29T16:41:40.039Z [error] :error[49m[39m
+[37m[41m2021-06-29T16:41:58.435Z [ERROR] :error[49m[39m
+[37m[41m2021-06-29T16:42:59.928Z [ERROR] :error[49m[39m
+[37m[41m2021-06-29T16:43:16.216Z [ERROR] :error[49m[39m
+[37m[41m2021-06-29T16:43:30.075Z [ERROR] :error[49m[39m
+[37m[41m2021-06-29T16:45:22.335Z [ERROR] :error[49m[39m
+[37m[41m2021-06-29T16:47:29.132Z [ERROR] :error[49m[39m
+[37m[41m2021-06-29T16:47:33.361Z [ERROR] :error[49m[39m
+[37m[41m2021-06-29T16:47:36.366Z [ERROR] :error[49m[39m

@@ -1,0 +1,19 @@
+{
+    "database":{
+        "database": "flyhigh",
+        "username": "postgres",
+        "password": "postgres",
+        "dialect": "sqlite",
+        "storage": "./prod-db.sqlite",
+        "logging":true
+    },
+    "mail":{
+        "host": "smtp.ethereal.email",
+        "port": 587,
+        "auth": {
+           "user": "judson.glover@ethereal.email",
+           "pass": "bJBmMYgAyVp8UeTNFz"
+        }
+     }
+       
+}
